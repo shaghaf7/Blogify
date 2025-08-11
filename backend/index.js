@@ -238,6 +238,7 @@ app.get("/myblogs", verifyToken, async (req, res) => {
 // Test route
 app.get("/", (req, res) => {
   res.send("Hello from enhanced blog backend!");
+  
 });
 
 // Start server after DB connection test

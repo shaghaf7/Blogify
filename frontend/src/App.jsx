@@ -19,7 +19,7 @@ function App() {
         <Route path='/allblogs' element={<Allblogs />} />
         <Route path='/addblog' element={<AddBlog/>}/>
         <Route path='/myblogs' element={<MyBlogs/>}/>
-        <Route path='/aiblo' element={<AIBlog/>}/>
+        <Route path='/aiblog' element={<AIBlog/>}/>
 
       </Routes>
     </>

@@ -16,6 +16,7 @@ export default function Navbar() {
         <Link to="/addblog" className="hover:underline">Add Blog</Link>
         <Link to="/myblogs" className="hover:underline">My Blogs</Link>
         <Link to="/allblogs" className="hover:underline">All Blogs</Link>
+        <Link to="/aiblog" className="hover:underline">AI Generated Blog</Link> {/* New Link */}
       </div>
       <button
         onClick={handleLogout}

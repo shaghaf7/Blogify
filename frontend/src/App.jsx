@@ -7,6 +7,7 @@ import Login from './components/Login';
 import Allblogs from './components/Allblogs';
 import AddBlog from './components/Addblog';
 import MyBlogs from './components/Myblogs';
+import AIBlog from './components/AIblog';
 
 
 function App() {
@@ -18,6 +19,7 @@ function App() {
         <Route path='/allblogs' element={<Allblogs />} />
         <Route path='/addblog' element={<AddBlog/>}/>
         <Route path='/myblogs' element={<MyBlogs/>}/>
+        <Route path='/aiblo' element={<AIBlog/>}/>
 
       </Routes>
     </>

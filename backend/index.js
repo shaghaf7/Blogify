@@ -5,6 +5,10 @@ const cors = require("cors");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
+const { GoogleGenerativeAI } = require("@google/generative-ai");
+
+// Gemini API setup
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 const app = express();
 
@@ -240,6 +244,82 @@ app.get("/", (req, res) => {
   res.send("Hello from enhanced blog backend!");
   
 });
+app.post("/autoblog", verifyToken, async (req, res) => {
+  const { title } = req.body;
+  if (!title) {
+    return res.status(400).json({ error: "Title is required" });
+  }
+
+  try {
+    const apiKey = process.env.GEMINI_API_KEY;
+    const prompt = `
+      Write a concise blog post (maximum 200 words) about "${title}".
+      Make it engaging and clear, with a short introduction, 1–2 key points, and a closing sentence.
+      Avoid overly long descriptions or unnecessary details.
+    `;
+
+    const response = await fetch(
+      "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" + apiKey,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          contents: [
+            {
+              parts: [{ text: prompt }],
+            },
+          ],
+        }),
+      }
+    );
+
+    const data = await response.json();
+
+    const content =
+      data?.candidates?.[0]?.content?.parts?.[0]?.text ||
+      "No content generated.";
+
+    const [dbResult] = await pool.query(
+      "INSERT INTO blogs (title, content, author_id) VALUES (?, ?, ?)",
+      [title, content, req.user.id]
+    );
+
+    res.status(201).json({
+      message: "Concise blog generated and saved successfully",
+      blog: { id: dbResult.insertId, title, content },
+    });
+  } catch (err) {
+    console.error("Error generating blog:", err);
+    res.status(500).json({ error: "Failed to generate blog" });
+  }
+});
+
+// Post an already generated blog into blogs table (protected)
+app.post("/postblog", verifyToken, async (req, res) => {
+  const { title, content } = req.body;
+
+  if (!title || !content) {
+    return res.status(400).json({ error: "Title and content are required" });
+  }
+
+  try {
+    const [result] = await pool.query(
+      "INSERT INTO blogs (title, content, author_id) VALUES (?, ?, ?)",
+      [title, content, req.user.id]
+    );
+
+    res.status(201).json({
+      message: "Blog posted successfully",
+      blog: { id: result.insertId, title, content, author_id: req.user.id },
+    });
+  } catch (err) {
+    console.error("Error posting blog:", err);
+    res.status(500).json({ error: "Failed to post blog" });
+  }
+});
+
 
 // Start server after DB connection test
 pool

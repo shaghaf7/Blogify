@@ -4,13 +4,11 @@ import { useNavigate } from "react-router-dom";
 export default function Login() {
   const navigate = useNavigate();
 
-  const [form, setForm] = useState({
-    username: "",
-    password: ""
-  });
-
+  const [form, setForm] = useState({ username: "", password: "" });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL; // <-- Use your Render backend URL
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -22,10 +20,10 @@ export default function Login() {
     setLoading(true);
 
     try {
-      const res = await fetch("http://localhost:3000/login", {
+      const res = await fetch(`${API_BASE_URL}/login`, {   // <-- Updated
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form)
+        body: JSON.stringify(form),
       });
 
       const data = await res.json();
@@ -67,10 +65,7 @@ export default function Login() {
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label
-              htmlFor="username"
-              className="block text-sm font-medium text-gray-700"
-            >
+            <label htmlFor="username" className="block text-sm font-medium text-gray-700">
               Username or Email
             </label>
             <input
@@ -85,10 +80,7 @@ export default function Login() {
           </div>
 
           <div>
-            <label
-              htmlFor="password"
-              className="block text-sm font-medium text-gray-700"
-            >
+            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
               Password
             </label>
             <input
